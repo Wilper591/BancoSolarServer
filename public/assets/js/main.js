@@ -1,4 +1,4 @@
-const URL_BASE = "http://localhost:3000/apiV1";
+const URL_BASE = "https://bancosolar.onrender.com/apiV1";
 const setInfoModal = (nombre, balance, id) => {
   $("#nombreEdit").val(nombre);
   $("#balanceEdit").val(balance);
