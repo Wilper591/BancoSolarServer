@@ -22,7 +22,6 @@ router.post("/transferencia", async (req, res) => {
   try {
     const { emisor, receptor, monto } = req.body;
     const newRegister = await createTransaction(emisor, receptor, monto);
-    console.log(newRegister)
     res.send(newRegister);
   } catch (error) {
     console.error("Hubo un error:", error.message);

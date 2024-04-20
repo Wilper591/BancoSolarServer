@@ -122,12 +122,16 @@ $("form:last").submit(async (e) => {
     return false;
   }
   try {
-    const response = await axios.post(`${URL_BASE}/transaction/transferencia`, {
-      emisor,
-      receptor,
-      monto,
+    const response = await fetch(`${URL_BASE}/transaction/transferencia`, {
+      method: "post",
+      body: JSON.stringify({
+        emisor,
+        receptor,
+        monto,
+      }),
+      headers: { "Content-Type": "application/json" },
     });
-    console.log(response);
+    const data = await response.json();
     location.reload();
   } catch (e) {
     console.log(e);
