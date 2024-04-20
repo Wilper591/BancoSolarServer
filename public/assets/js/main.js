@@ -6,7 +6,7 @@ const setInfoModal = (nombre, balance, id) => {
 };
 
 const editUsuario = async (id) => {
-  const nombre = $("#nombreEdit").val();
+  let nombre = $("#nombreEdit").val();
   const balance = $("#balanceEdit").val();
   const regexNombre = /^[A-Za-zñÑ\sáíéóúÁÍÉÓÚäÄëËïÏöÖüÜ]+$/;
   const regexBalance = /^\d+$/;
@@ -154,9 +154,13 @@ const getUsuarios = async () => {
                     class="btn btn-warning mr-2"
                     data-toggle="modal"
                     data-target="#exampleModal"
-                    onclick="setInfoModal('${c.nombre}', '${c.balance}', '${c.id}')"
+                    onclick="setInfoModal('${c.nombre}', '${c.balance}', '${
+      c.id
+    }')"
                   >Editar</button
-                  ><button class="btn btn-danger" onclick="eliminarUsuario('${c.id}')">Eliminar</button>
+                  ><button class="btn btn-danger" onclick="eliminarUsuario('${
+                    c.id
+                  }')">Eliminar</button>
                 </td>
               </tr>
          `);

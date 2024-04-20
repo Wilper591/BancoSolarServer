@@ -41,12 +41,21 @@ const createTransaction = async (emisor, receptor, monto) => {
     if (!transaction || !voucher) {
       const rollback = "ROLLBACK";
       await pool.query(rollback);
+
       console.log({
         status: "Error",
         message: "La operación ha sido anulada",
         code: 500,
       });
+      return {
+        status: "Error",
+        message: "La operación ha sido anulada",
+        code: 500,
+      };
     } else {
+      /* Finaliza transcción */
+      await pool.query("COMMIT");
+      console.log("COMMIT END");
       console.log({
         status: "Success",
         message: "Operación realizada con éxito.",
@@ -54,9 +63,6 @@ const createTransaction = async (emisor, receptor, monto) => {
         transaction: transaction,
         voucher: voucher,
       });
-      /* Finaliza transcción */
-      await pool.query("COMMIT");
-      console.log("COMMIT END");
       return {
         status: "Success",
         message: "Operación realizada con éxito.",
@@ -131,7 +137,4 @@ const getTransactions = async () => {
   }
 };
 
-export {
-  createTransaction,
-  getTransactions,
-};
+export { createTransaction, getTransactions };
