@@ -1,7 +1,37 @@
 import { pool } from "../db.js";
 import moment from "moment";
-import { newTransaction } from "./users.controller.js";
 const fecha = moment().format("DD-M-YYYY H:mm:ss");
+
+/* Genera una transacción entre usuarios */
+const newTransaction = async (balance, emisor, receptor) => {
+  try {
+    const discount =
+      "UPDATE usuarios SET balance = balance - $1 WHERE id = $2 RETURNING *";
+    const valuesDisc = [balance, emisor];
+    const clientDiscount = await pool.query(discount, valuesDisc);
+
+    const accredit =
+      "UPDATE usuarios SET balance = balance + $1 WHERE id = $2 RETURNING *";
+    const valuesAccre = [balance, receptor];
+    const clientAccredit = await pool.query(accredit, valuesAccre);
+
+    return {
+      status: "Success",
+      message: "Transacción realizada con éxito.",
+      code: 200,
+      emisor: clientDiscount.rows[0],
+      receptor: clientAccredit.rows[0],
+    };
+  } catch (error) {
+    return console.log({
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      constraint: error.constraint,
+      mensajeDelProgramador: "Transacción fallida",
+    });
+  }
+};
 
 /* Genera registro de transferencia */
 const newVoucher = async (emisor, receptor, monto) => {
