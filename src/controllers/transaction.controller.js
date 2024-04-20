@@ -1,6 +1,6 @@
 import { pool } from "../db.js";
 import moment from "moment";
-const fecha = moment().format("");
+const fecha = moment().format();
 
 /* Genera una transacción entre usuarios */
 const newTransaction = async (balance, emisor, receptor) => {

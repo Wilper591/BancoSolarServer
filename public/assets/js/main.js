@@ -176,6 +176,7 @@ const eliminarUsuario = async (id) => {
       method: "DELETE",
     });
     if (response.ok) {
+      location.reload();
       getUsuarios();
     } else {
       throw new Error("No se pudo eliminar el usuario.");
