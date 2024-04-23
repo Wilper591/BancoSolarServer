@@ -68,6 +68,7 @@ const editUsuario = async (id) => {
     successMsj.innerHTML = `<p>${data.message}</p>`;
     setTimeout(() => {
       limpiarMsj(successMsj);
+      location.reload();
     }, 3000);
     getUsuarios();
   } catch (e) {
