@@ -23,7 +23,7 @@ const createUser = async (nombre, balance) => {
       });
       return {
         status: "Error",
-        message: "No se pudo crear al nuevo usuario.",
+        message: "No se pudo crear al nuevo usuario",
         code: 500,
       };
     } else {
@@ -39,7 +39,7 @@ const createUser = async (nombre, balance) => {
       console.log("COMMIT END");
       return {
         status: "Success",
-        message: "Usuario creado Éxitosamente.",
+        message: "Usuario creado Éxitosamente",
         code: 200,
         nuevoUsuario: newUser.rows,
       };
@@ -59,22 +59,21 @@ const createUser = async (nombre, balance) => {
 /* Trae listado de clientes */
 const getUsers = async () => {
   try {
-    /* Inicia la transacción */
-    console.log("BEGIN START GET USERS");
-    await pool.query("BEGIN");
-
     const query = "SELECT * FROM usuarios ORDER BY id ASC;";
     const result = await pool.query(query);
 
     if (!result.rowCount) {
       /* Error */
-      const rollback = "ROLLBACK";
-      await pool.query(rollback);
       console.log({
         status: "Error",
         message: "No se pudo obtener el listado de clientes.",
         code: 500,
       });
+      return {
+        status: "Error",
+        message: "No se pudo obtener el listado de clientes.",
+        code: 500,
+      };
     } else {
       /* Success */
       console.log({
@@ -83,9 +82,6 @@ const getUsers = async () => {
         code: 200,
         listado: result.rows,
       });
-      /* Finaliza transcción */
-      await pool.query("COMMIT");
-      console.log("COMMIT END");
       return {
         status: "Success",
         message: "Listado de clientes obtenido exitosamente.",
@@ -94,7 +90,37 @@ const getUsers = async () => {
       };
     }
   } catch (error) {
-    await pool.end();
+    return console.log({
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      constraint: error.constraint,
+      mensajeDelProgramador: "Busqueda de usuarios fallida",
+    });
+  }
+};
+
+/* Genera una transacción entre usuarios */
+const newTransaction = async (balance, emisor, receptor) => {
+  try {
+    const discount =
+      "UPDATE usuarios SET balance = balance - $1 WHERE id = $2 RETURNING *";
+    const valuesDisc = [balance, emisor];
+    const clientDiscount = await pool.query(discount, valuesDisc);
+
+    const accredit =
+      "UPDATE usuarios SET balance = balance + $1 WHERE id = $2 RETURNING *";
+    const valuesAccre = [balance, receptor];
+    const clientAccredit = await pool.query(accredit, valuesAccre);
+
+    return {
+      status: "Success",
+      message: "Transacción realizada con éxito.",
+      code: 200,
+      emisor: clientDiscount.rows[0],
+      receptor: clientAccredit.rows[0],
+    };
+  } catch (error) {
     return console.log({
       message: error.message,
       code: error.code,
@@ -204,15 +230,21 @@ const deleteUser = async (id) => {
       };
     }
   } catch (error) {
-    alert("Error al eliminar usuario: " + error.message);
-    return console.log({
+    console.log({
       message: error.message,
       code: error.code,
       detail: error.detail,
       constraint: error.constraint,
-      mensajeDelProgramador: "Eliminación de Usuario fallido",
+      mensajeDelProgramador: "Eliminación de Usuario Fallido.",
     });
+    return {
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      constraint: error.constraint,
+      mensajeDelProgramador: "Eliminación de Usuario Fallido",
+    };
   }
 };
 
-export { createUser, getUsers, editUser, deleteUser };
+export { createUser, getUsers, newTransaction, editUser, deleteUser };

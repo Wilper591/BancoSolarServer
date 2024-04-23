@@ -1,5 +1,6 @@
 import rutas from "./routes/index.routes.js";
 import express from "express";
+import { __dirname } from "../index.js";
 import cors from "cors";
 const app = express();
 const PORT = 3000;
@@ -14,8 +15,13 @@ app.use(express.json());
 app.use("/apiV1", rutas);
 
 //Ruta Genérica
-app.get("*", (req, res) => {
-  res.status(404).send("Esta página No Existe");
+app.get("*/*", (req, res) => {
+  try {
+    res.status(404).sendFile(__dirname + "/public/404.html");
+  } catch (error) {
+    console.error("Hubo un error", error.message);
+    res.status(500).send(error.message);
+  }
 });
 
 export { app, PORT };

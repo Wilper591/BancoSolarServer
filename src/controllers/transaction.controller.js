@@ -1,37 +1,7 @@
 import { pool } from "../db.js";
 import moment from "moment";
+import { newTransaction } from "./users.controller.js";
 const fecha = moment().format();
-
-/* Genera una transacción entre usuarios */
-const newTransaction = async (balance, emisor, receptor) => {
-  try {
-    const discount =
-      "UPDATE usuarios SET balance = balance - $1 WHERE id = $2 RETURNING *";
-    const valuesDisc = [balance, emisor];
-    const clientDiscount = await pool.query(discount, valuesDisc);
-
-    const accredit =
-      "UPDATE usuarios SET balance = balance + $1 WHERE id = $2 RETURNING *";
-    const valuesAccre = [balance, receptor];
-    const clientAccredit = await pool.query(accredit, valuesAccre);
-
-    return {
-      status: "Success",
-      message: "Transacción realizada con éxito.",
-      code: 200,
-      emisor: clientDiscount.rows[0],
-      receptor: clientAccredit.rows[0],
-    };
-  } catch (error) {
-    return console.log({
-      message: error.message,
-      code: error.code,
-      detail: error.detail,
-      constraint: error.constraint,
-      mensajeDelProgramador: "Transacción fallida",
-    });
-  }
-};
 
 /* Genera registro de transferencia */
 const newVoucher = async (emisor, receptor, monto) => {
@@ -71,21 +41,17 @@ const createTransaction = async (emisor, receptor, monto) => {
     if (!transaction || !voucher) {
       const rollback = "ROLLBACK";
       await pool.query(rollback);
-
       console.log({
         status: "Error",
-        message: "La operación ha sido anulada",
+        message: "No se pudo realizar la transacción",
         code: 500,
       });
       return {
         status: "Error",
-        message: "La operación ha sido anulada",
+        message: "No se pudo realizar la transacción",
         code: 500,
       };
     } else {
-      /* Finaliza transcción */
-      await pool.query("COMMIT");
-      console.log("COMMIT END");
       console.log({
         status: "Success",
         message: "Operación realizada con éxito.",
@@ -93,9 +59,12 @@ const createTransaction = async (emisor, receptor, monto) => {
         transaction: transaction,
         voucher: voucher,
       });
+      /* Finaliza transcción */
+      await pool.query("COMMIT");
+      console.log("COMMIT END");
       return {
         status: "Success",
-        message: "Operación realizada con éxito.",
+        message: "Operación realizada con éxito",
         code: 200,
         transaction: transaction,
         voucher: voucher,
@@ -116,53 +85,48 @@ const createTransaction = async (emisor, receptor, monto) => {
 /* Trae listado de transacciones */
 const getTransactions = async () => {
   try {
-    /* Inicia la transacción */
-    console.log("BEGIN START GET TRANSACTION");
-    await pool.query("BEGIN");
-
     const query = `
-    SELECT transferencias.*, emisor.nombre AS nombre_emisor, receptor.nombre AS nombre_receptor
+    SELECT transferencias.id, transferencias.monto, transferencias.fecha, emisor.nombre AS nombre_emisor, receptor.nombre AS nombre_receptor
     FROM transferencias 
     INNER JOIN usuarios emisor ON transferencias.emisor = emisor.id
-    INNER JOIN usuarios receptor ON transferencias.receptor = receptor.id;
-    `;
+    INNER JOIN usuarios receptor ON transferencias.receptor = receptor.id
+    ORDER BY id ASC;`;
     const result = await pool.query(query);
 
     if (!result.rowCount) {
       /* Error */
-      const rollback = "ROLLBACK";
-      await pool.query(rollback);
       console.log({
         status: "Error",
-        message: "No se pudo obtener el listado de clientes.",
+        message: "No se pudo obtener el listado de transferencias",
         code: 500,
       });
+      return {
+        status: "Error",
+        message: "No se pudo obtener el listado de transferencias",
+        code: 500,
+      };
     } else {
-      /* Finaliza transcción */
-      await pool.query("COMMIT");
-      console.log("COMMIT END");
       /* Success */
       console.log({
         status: "Success",
-        message: "Listado de clientes obtenido exitosamente.",
+        message: "Listado de transferencias obtenido exitosamente.",
         code: 200,
         listado: result.rows,
       });
       return {
         status: "Success",
-        message: "Listado de clientes obtenido exitosamente.",
+        message: "Listado de transferencias obtenido exitosamente.",
         code: 200,
         listado: result.rows,
       };
     }
   } catch (error) {
-    await pool.end();
     return console.log({
       message: error.message,
       code: error.code,
       detail: error.detail,
       constraint: error.constraint,
-      mensajeDelProgramador: "Transacción fallida",
+      mensajeDelProgramador: "Busqueda de transferencias fallida",
     });
   }
 };

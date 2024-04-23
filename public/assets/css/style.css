@@ -1,8 +1,43 @@
-  body {
-    background: #e5e1dd;
-  }
-  form {
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 10px;
-  }
+body {
+  background: #e5e1dd;
+}
+form {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+#login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+}
+#errorMsj,
+#errorModal {
+  display: flex;
+  justify-content: center;
+}
+#errorMsj p,
+#errorModal p {
+  text-align: center;
+  background-color: #dc3545;
+  color: white;
+  width: auto;
+  padding: 0.4rem;
+  margin: 1rem;
+  border-radius: 1rem;
+}
+
+#successMsj {
+  display: flex;
+  justify-content: center;
+}
+#successMsj p {
+  text-align: center;
+  background-color: #198754;
+  color: white;
+  width: auto;
+  padding: 0.4rem;
+  margin: 1rem;
+  border-radius: 1rem;
+}
