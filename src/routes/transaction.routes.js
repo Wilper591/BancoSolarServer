@@ -6,7 +6,7 @@ import {
 } from "../controllers/transaction.controller.js";
 
 //Trae la Lista de Transferencias
-router.get("/transferencias", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const getTransferList = await getTransactions();
     res.send(getTransferList);
@@ -18,7 +18,7 @@ router.get("/transferencias", async (req, res) => {
 
 /* Genera una transferencia entre cuentas de usuario
  y crea un registro de transferencia */
-router.post("/transferencia", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { emisor, receptor, monto } = req.body;
     const newRegister = await createTransaction(emisor, receptor, monto);

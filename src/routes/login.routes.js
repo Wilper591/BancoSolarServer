@@ -3,7 +3,7 @@ import { loginUser } from "../controllers/login.controller.js";
 const router = Router();
 
 
-router.get("/admin", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const { user, password } = req.query;
     const login = await loginUser(user, password);

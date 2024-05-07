@@ -8,7 +8,7 @@ import {
 } from "../controllers/users.controller.js";
 
 //Crea nuevo usuario
-router.post("/usuario", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { nombre, balance } = req.body;
     const newUser = await createUser(nombre, balance);
@@ -20,7 +20,7 @@ router.post("/usuario", async (req, res) => {
 });
 
 //Trae la Lista de Usuarios
-router.get("/usuarios", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const getListUsers = await getUsers();
     res.send(getListUsers);
@@ -31,7 +31,7 @@ router.get("/usuarios", async (req, res) => {
 });
 
 //Edita los datos del usuario
-router.put("/usuario", async (req, res) => {
+router.put("/", async (req, res) => {
   try {
     const { nombre, balance } = req.body;
     const { id } = req.query;
@@ -44,7 +44,7 @@ router.put("/usuario", async (req, res) => {
 });
 
 //Elimina usuarios por ID
-router.delete("/usuario", async (req, res) => {
+router.delete("/", async (req, res) => {
   try {
     const { id } = req.query;
     const eraseUser = await deleteUser(id);
