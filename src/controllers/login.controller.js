@@ -2,7 +2,7 @@ import { pool } from "../db.js";
 
 const loginUser = async (user, password) => {
   try {
-    const text = "SELECT email, password FROM login WHERE email = $1 AND password = $2;";
+    const text = "SELECT email, password FROM administradores WHERE email = $1 AND password = $2;";
     const values = [user, password];
     const result = await pool.query(text, values);
 
